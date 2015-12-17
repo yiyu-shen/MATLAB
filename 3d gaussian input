@@ -1,0 +1,58 @@
+%heat transfer project%
+%3D conduction problem with gaussian laser heat input%
+%unites in: x,y,z,r_zero [mm]; t [s]; Qinput [W];  Ti [K]; v[mm/s]; u[mm/s];
+%k[W/mm*K]; Cp [J/g*K]; density [g/mm^3]
+
+%the location of thermal couple is placed, unites in [mm]
+x=5;   
+y=2;
+z=0;
+u=8.7;     %speed on x direction [mm/s]
+v=0;     %speed on y direction [mm/s]
+Ti=180;  %initial temperature  [K]
+
+r_zero=0.2;   %laser beam radius [mm]
+Qinput=200;   %laser power       [W]
+
+density=0.00787;  %density       [g/mm^3]
+Cp=0.5;           %heat capacity [J/g*K]
+k_list=[0.05];           %thermal conductivity [W/mm*K]
+%alpha=k/(density*Cp) ; %thermal diffusivity
+
+delta_t=0.0001; %time step
+tend=5;        %end time
+time=delta_t:delta_t:tend;   %x-axis for plot
+%A=2*(Qinput*delta_t)/(density*Cp*(3.14159^1.5)*(alpha^0.5));  %easy for compute
+
+T=[];
+temp1=[];
+temp2=0;
+
+for b=1:1
+    k=k_list(b);   
+    alpha=k/(density*Cp) ; %thermal diffusivity
+    A=2*(Qinput*delta_t)/(density*Cp*(3.14159^1.5)*(alpha^0.5));  %easy for compute
+
+for i=1:tend*10000
+    n=i*delta_t;              %this for loop find temperature value at every time point
+
+    for j=1:i
+        k=j*delta_t;
+        t=k-delta_t/2;
+        temp1(j)=A*(1/(n-t))*(1/(r_zero^2+8*alpha*(n-t)))*exp(-((2*(x-u*t)^2+2*(y-v*t)^2)/(r_zero^2+8*alpha*(n-t)))-((2*z^2)/(8*alpha*(n-t))));
+        
+    end
+
+temp2=sum(temp1);   %sum instead of imtergal
+T(b,i)=Ti+temp2;    %discrete method instead of intergal
+
+temp1=[];    %inilized temp vector
+temp2=0;     %inilized temp number
+end
+
+
+end
+plot(time,T)
+
+
+
